@@ -1,5 +1,8 @@
 package com.example.pruebaconcepto.config;
 
+import com.example.pruebaconcepto.config.filters.JwtTokenValidator;
+import com.example.pruebaconcepto.util.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,11 +23,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import com.example.pruebaconcepto.services.UserDetailsServiceImpl;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
 
 //    @Bean
@@ -48,6 +55,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) //se habilita para form login
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class) //se ejecuta antes del basic authentication filter
                 .build();
     }
 
