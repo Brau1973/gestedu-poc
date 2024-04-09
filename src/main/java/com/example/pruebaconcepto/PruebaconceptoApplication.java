@@ -56,7 +56,7 @@ public class PruebaconceptoApplication {
 
 			Usuario admin = Usuario.builder()
 					.username("admin")
-					.password("1234")
+					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
 					.email("correo@correo")
 					.isEnable(true)
 					.accountNonExpired(true)
@@ -66,7 +66,7 @@ public class PruebaconceptoApplication {
 					.build();
 			Usuario estudiante = Usuario.builder()
 					.username("estudiante")
-					.password("1234")
+					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
 					.email("correo@correo")
 					.isEnable(true)
 					.accountNonExpired(true)
@@ -76,7 +76,7 @@ public class PruebaconceptoApplication {
 					.build();
 			Usuario profesor = Usuario.builder()
 					.username("profesor")
-					.password("1234")
+					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
 					.email("correo@correo")
 					.isEnable(true)
 					.accountNonExpired(true)
@@ -86,7 +86,7 @@ public class PruebaconceptoApplication {
 					.build();
 			Usuario invitado = Usuario.builder()
 					.username("invitado")
-					.password("1234")
+					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
 					.email("correo@correo")
 					.isEnable(true)
 					.accountNonExpired(true)
