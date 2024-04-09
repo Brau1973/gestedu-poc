@@ -87,6 +87,7 @@ public class PruebaconceptoApplication {
 			Usuario invitado = Usuario.builder()
 					.username("invitado")
 					.password("1234")
+					.email("correo@correo")
 					.isEnable(true)
 					.accountNonExpired(true)
 					.accountNonLocked(true)
