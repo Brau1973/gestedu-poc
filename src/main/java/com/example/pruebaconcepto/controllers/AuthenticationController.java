@@ -1,5 +1,6 @@
 package com.example.pruebaconcepto.controllers;
 
+import com.example.pruebaconcepto.dtos.AuthCreateUserRequest;
 import com.example.pruebaconcepto.dtos.AuthLoginRequest;
 import com.example.pruebaconcepto.dtos.AuthResponse;
 import com.example.pruebaconcepto.services.UserDetailsServiceImpl;
@@ -24,8 +25,8 @@ public class AuthenticationController {
         return new ResponseEntity<>(this.userDetailsService.loginUser(userRequest), HttpStatus.OK);
     }
 
-//    @PostMapping("/register")
-//    public ResponseEntity<AuthResponse> register(@RequestBody @Valid AuthCreateUser authCreateUser) {
-//        return new ResponseEntity<>(this.userDetailsService.registerUser(userRequest), HttpStatus.CREATED);
-//    }
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid AuthCreateUserRequest authCreateUserRequest) {
+        return new ResponseEntity<>(this.userDetailsService.registerUser(authCreateUserRequest), HttpStatus.CREATED);
+    }
 }
