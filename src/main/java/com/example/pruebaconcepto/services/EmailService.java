@@ -57,15 +57,12 @@ public class EmailService {
     public void sendEmailTemplate(EmailValuesDTO dto) {
         MimeMessage message = javaMailSender.createMimeMessage();
 
-        System.out.println(dto.getJwt());
-        System.out.println(urlFront+ dto.getJwt());
-
         try{
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             Context context = new Context();
             Map<String, Object> model = new HashMap<>();
             model.put("username", dto.getUsername());
-            model.put("url", urlFront + dto.getJwt());
+            model.put("url", urlFront + dto.getTokenPassword());
             context.setVariables(model);
             String  htmlText = templateEngine.process("emailPass", context);
             helper.setFrom(dto.getMailFrom());

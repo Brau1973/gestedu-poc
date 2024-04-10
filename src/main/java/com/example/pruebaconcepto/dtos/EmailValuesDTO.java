@@ -13,5 +13,5 @@ public class EmailValuesDTO {
     private String mailTo;
     private String mailSubject;
     private String username;
-    private String jwt;
+    private String tokenPassword;
 }

@@ -55,7 +55,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) //se habilita para form login
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                //.addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class) //se ejecuta antes del basic authentication filter
+                .authorizeHttpRequests(authorize -> {
+                    authorize.requestMatchers(HttpMethod.POST, "/email/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
+                    authorize.anyRequest().denyAll();
+                })
+                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class) //se ejecuta antes del basic authentication filter
                 .build();
     }
 

@@ -1,28 +1,21 @@
 package com.example.pruebaconcepto.dtos;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsuarioDTO {
-
-    @NotBlank
-    private String username;
+public class ChangePasswordDTO {
 
     @NotBlank
     private String password;
 
-    @Email
     @NotBlank
-    private String email;
+    private String confirmPassword;
+
+    @NotBlank
     private String tokenPassword;
-    private Set<String> roles;
 }

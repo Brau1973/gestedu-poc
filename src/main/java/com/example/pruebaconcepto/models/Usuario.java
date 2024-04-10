@@ -28,6 +28,8 @@ public class Usuario {
     @NotBlank
     private String email;
 
+    private String tokenPassword;
+
     @Column(name= "is_enable")
     private Boolean isEnable;
 
