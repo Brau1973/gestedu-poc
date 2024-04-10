@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) //se habilita para form login
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class) //se ejecuta antes del basic authentication filter
+                //.addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class) //se ejecuta antes del basic authentication filter
                 .build();
     }
 
