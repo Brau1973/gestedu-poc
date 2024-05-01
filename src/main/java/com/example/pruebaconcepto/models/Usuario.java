@@ -4,17 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Setter
-@Getter
-@Builder
+@Data
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "usuarios")
-public class Usuario {
+public abstract class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +20,24 @@ public class Usuario {
 
     @Column(unique = true)
     @NotBlank
-    private String username;
+    private String ci;
+
     @NotBlank
-    private String password;
+    private String nombre;
+
+    @NotBlank
+    private String apellido;
+
+    @Column(unique = true)
     @NotBlank
     private String email;
 
-    private String tokenPassword;
+    @NotBlank
+    private String password;
+
+    private String telefono;
+    private String domicilio;
+    private Date fechaNac;
 
     @Column(name= "is_enable")
     private Boolean isEnable;
@@ -42,9 +51,4 @@ public class Usuario {
     @Column (name= "credentials_non_expired")
     private Boolean credentialsNonExpired;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "usuarios_roles",
-            joinColumns = @JoinColumn(name = "usuario_id"),
-            inverseJoinColumns = @JoinColumn(name = "rol_id"))
-    private Set<Rol> roles = new HashSet<>();
 }

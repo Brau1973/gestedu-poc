@@ -33,22 +33,6 @@ public class SecurityConfig {
     @Autowired
     private JwtUtils jwtUtils;
 
-
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-//        return httpSecurity
-//                .csrf(csrf -> csrf.disable()) //se habilita para form login
-//                .httpBasic(Customizer.withDefaults())
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(authorize -> {
-//                    authorize.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
-//                    authorize.requestMatchers(HttpMethod.GET, "/auth/helloSecure").hasAuthority("read");
-//                    authorize.anyRequest().denyAll();
-//                })
-//                .build();
-//
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -56,9 +40,11 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers(HttpMethod.POST, "/email/**").permitAll();
-                    authorize.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
-                    authorize.anyRequest().denyAll();
+//                    authorize.requestMatchers(HttpMethod.POST, "/login").permitAll();
+//                    authorize.requestMatchers(HttpMethod.POST, "/registro").permitAll();
+//                    authorize.requestMatchers(HttpMethod.POST, "/registro/usuario").hasAuthority("ROL_ADMINISTRADOR");
+//                    authorize.requestMatchers(HttpMethod.GET, "/hello").hasAuthority("ROL_ADMINISTRADOR");
+                    authorize.anyRequest().permitAll();
                 })
                 .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
                 .build();

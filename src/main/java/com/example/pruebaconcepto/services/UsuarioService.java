@@ -17,23 +17,12 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    public Optional<Usuario> getByUsername(String username) {
-        return usuarioRepository.findByUsername(username);
+    public Optional<Usuario> getByCi(String ci) {
+        return usuarioRepository.findByCi(ci);
     }
 
     public Optional<Usuario> getByEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
 
-    public Optional<Usuario> getByUsernameOrEmail(String username, String email) {
-        return usuarioRepository.findByUsernameOrEmail(username, email);
-    }
-
-    public Optional<Usuario> getByTokenPassword(String tokenPassword) {
-        return usuarioRepository.findByTokenPassword(tokenPassword);
-    }
-
-    public void updateUsuario(Usuario usuario){
-        usuarioRepository.save(usuario);
-    }
 }

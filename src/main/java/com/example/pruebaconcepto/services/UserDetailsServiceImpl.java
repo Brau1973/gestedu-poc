@@ -1,19 +1,17 @@
 package com.example.pruebaconcepto.services;
 
-import com.example.pruebaconcepto.dtos.AuthCreateUserRequest;
+import com.example.pruebaconcepto.dtos.CrearUsuarioRequest;
 import com.example.pruebaconcepto.dtos.AuthLoginRequest;
 import com.example.pruebaconcepto.dtos.AuthResponse;
-import com.example.pruebaconcepto.models.Rol;
-import com.example.pruebaconcepto.models.Usuario;
-import com.example.pruebaconcepto.repositories.RolRepository;
+import com.example.pruebaconcepto.models.*;
 import com.example.pruebaconcepto.repositories.UsuarioRepository;
 import com.example.pruebaconcepto.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,9 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService{
@@ -39,56 +36,62 @@ public class UserDetailsServiceImpl implements UserDetailsService{
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RolRepository rolRepository;
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        Usuario usuario = usuarioRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+        if (usuario instanceof Administrador) {
+            authorities.add(new SimpleGrantedAuthority("ROL_ADMINISTRADOR"));
+        } else if (usuario instanceof Coordinador) {
+            authorities.add(new SimpleGrantedAuthority("ROL_COORDINADOR"));
+        } else if (usuario instanceof Funcionario) {
+            authorities.add(new SimpleGrantedAuthority("ROL_FUNCIONARIO"));
+        } else if (usuario instanceof Estudiante) {
+            authorities.add(new SimpleGrantedAuthority("ROL_ESTUDIANTE"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROL_INVITADO"));
+        }
 
-        usuario.getRoles().forEach(rol -> {
-            authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(rol.getNombre().name())));
-        });
-
-        usuario.getRoles().stream()
-                .flatMap(rol -> rol.getPermisos().stream())
-                .forEach(permiso -> {
-                    authorityList.add(new SimpleGrantedAuthority(permiso.getNombre()));
-        });
-
-        return new User(usuario.getUsername(),
+        User user = new User(usuario.getEmail(),
                 usuario.getPassword(),
                 usuario.getIsEnable(),
                 usuario.getAccountNonExpired(),
                 usuario.getCredentialsNonExpired(),
                 usuario.getAccountNonLocked(),
-                authorityList);
-
+                authorities);
+        return user;
     }
 
     public AuthResponse loginUser(Usuario usuario) {
-        return new AuthResponse(usuario.getUsername(), "Usuario logueado", "jwt", true);
+        return new AuthResponse(usuario.getEmail(), "Usuario logueado", "jwt", true);
     }
 
     public AuthResponse loginUser(AuthLoginRequest authLoginRequest) {
         //generar token de acceso
-        String username = authLoginRequest.username();
+        String email = authLoginRequest.email();
         String password = authLoginRequest.password();
 
-        Authentication authentication = this.autenticar(username, password);
+        Authentication authentication = this.autenticar(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = jwtUtils.crearToken(authentication);
 
-        AuthResponse authResponse = new AuthResponse(username, "Usuario logueado", token, true);
+        // Obtener las autoridades del usuario
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        List<String> authorityNames = new ArrayList<>();
+        for (GrantedAuthority authority : authorities) {
+            authorityNames.add(authority.getAuthority());
+        }
+        System.out.println("Autoridades del usuario: " + authorityNames);
+
+        AuthResponse authResponse = new AuthResponse(email, "Usuario logueado", token, true);
         return authResponse;
     }
 
-    public Authentication autenticar(String username, String password) {
-        UserDetails userDetails = this.loadUserByUsername(username);
+    public Authentication autenticar(String email, String password) {
+        UserDetails userDetails = this.loadUserByUsername(email);
         if(userDetails == null){
             throw new BadCredentialsException("Usuario no encontrado");
         }
@@ -97,45 +100,60 @@ public class UserDetailsServiceImpl implements UserDetailsService{
             throw new BadCredentialsException("Contraseña incorrecta");
         }
 
-        return new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(email, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
-    public AuthResponse registerUser(AuthCreateUserRequest authCreateUserRequest) {
-
-        List<String> rolesList = authCreateUserRequest.rolesRequest().rolesList();
-        Set<Rol> roles = rolRepository.findRolsByNombreIn(rolesList).stream().collect(Collectors.toSet());
-        if(roles.isEmpty()){
-            throw new RuntimeException("No se encontraron roles");
+    public AuthResponse registrarUsuario (CrearUsuarioRequest crearUsuarioRequest) {
+        Usuario usuario;
+        switch(crearUsuarioRequest.getTipoUsuario()){
+            case ADMINISTRADOR:
+                usuario = new Administrador();
+                break;
+            case COORDINADOR:
+                usuario = new Coordinador();
+                break;
+            case FUNCIONARIO:
+                usuario = new Funcionario();
+                break;
+            case ESTUDIANTE:
+                usuario = new Estudiante();
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de usuario no válido");
         }
-
-        Usuario usuario = Usuario.builder()
-                .username(authCreateUserRequest.username())
-                .password(passwordEncoder.encode(authCreateUserRequest.password()))
-                .email(authCreateUserRequest.email())
-                .roles(roles)
-                .isEnable(true)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .build();
+        usuario.setCi(crearUsuarioRequest.getCi());
+        usuario.setNombre(crearUsuarioRequest.getNombre());
+        usuario.setApellido(crearUsuarioRequest.getApellido());
+        usuario.setEmail(crearUsuarioRequest.getEmail());
+        usuario.setPassword(passwordEncoder.encode(crearUsuarioRequest.getPassword()));
+        usuario.setTelefono(crearUsuarioRequest.getTelefono());
+        usuario.setDomicilio(crearUsuarioRequest.getDomicilio());
+        usuario.setFechaNac(crearUsuarioRequest.getFechaNac());
+        usuario.setIsEnable(true);
+        usuario.setAccountNonExpired(true);
+        usuario.setAccountNonLocked(true);
+        usuario.setCredentialsNonExpired(true);
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
         //generar token de acceso
         ArrayList<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        usuarioGuardado.getRoles().forEach(rol -> {
-            authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(rol.getNombre().name())));
-        });
-        usuarioGuardado.getRoles().stream()
-                .flatMap(rol -> rol.getPermisos().stream())
-                .forEach(permiso -> {
-                    authorityList.add(new SimpleGrantedAuthority(permiso.getNombre()));
-                });
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(usuarioGuardado.getUsername(), usuarioGuardado.getPassword(), authorityList);
+        if (usuarioGuardado instanceof Administrador) {
+            authorityList.add(new SimpleGrantedAuthority("ROL_ADMINISTRADOR"));
+        } else if (usuarioGuardado instanceof Coordinador) {
+            authorityList.add(new SimpleGrantedAuthority("ROL_COORDINADOR"));
+        } else if (usuarioGuardado instanceof Funcionario) {
+            authorityList.add(new SimpleGrantedAuthority("ROL_FUNCIONARIO"));
+        } else if (usuarioGuardado instanceof Estudiante) {
+            authorityList.add(new SimpleGrantedAuthority("ROL_ESTUDIANTE"));
+        } else {
+            authorityList.add(new SimpleGrantedAuthority("ROL_INVITADO"));
+        }
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(usuarioGuardado.getEmail(), usuarioGuardado.getPassword(), authorityList);
 
         String accessToken = jwtUtils.crearToken(authentication);
-        AuthResponse authResponse = new AuthResponse(usuarioGuardado.getUsername(), "Usuario registrado", accessToken, true);
+        AuthResponse authResponse = new AuthResponse(usuarioGuardado.getEmail(), "Usuario registrado", accessToken, true);
         return authResponse;
     }
 }

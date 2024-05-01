@@ -1,13 +1,12 @@
 package com.example.pruebaconcepto;
 
-import com.example.pruebaconcepto.dtos.RolEnum;
-import com.example.pruebaconcepto.models.Permiso;
-import com.example.pruebaconcepto.models.Rol;
-import com.example.pruebaconcepto.models.Usuario;
+import com.example.pruebaconcepto.models.*;
 import com.example.pruebaconcepto.repositories.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Set;
@@ -24,82 +23,64 @@ public class PruebaconceptoApplication {
 	@Bean
 	CommandLineRunner init(UsuarioRepository usuarioRepository) {
 		return args -> {
-			Permiso crearPermiso = Permiso.builder()
-					.nombre("Crear")
-					.build();
-			Permiso leerPermiso = Permiso.builder()
-					.nombre("Leer")
-					.build();
-			Permiso actualizarPermiso = Permiso.builder()
-					.nombre("Actualizar")
-					.build();
-			Permiso eliminarPermiso = Permiso.builder()
-					.nombre("Eliminar")
-					.build();
 
-			Rol	adminRol = Rol.builder()
-					.nombre(RolEnum.ADMIN)
-					.permisos(Set.of(crearPermiso, leerPermiso, actualizarPermiso, eliminarPermiso))
-					.build();
-			Rol estudianteRol = Rol.builder()
-					.nombre(RolEnum.ESTUDIANTE)
-					.permisos(Set.of(leerPermiso))
-					.build();
-			Rol profesorRol = Rol.builder()
-					.nombre(RolEnum.PROFESOR)
-					.permisos(Set.of(crearPermiso, leerPermiso, actualizarPermiso))
-					.build();
-			Rol invitadoRol = Rol.builder()
-					.nombre(RolEnum.INVITADO)
-					.permisos(Set.of(leerPermiso))
-					.build();
+			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-			Usuario admin = Usuario.builder()
-					.username("admin")
-					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
-					.email("silviajanet@gmail.com")
-					.tokenPassword(null)
-					.isEnable(true)
-					.accountNonExpired(true)
-					.accountNonLocked(true)
-					.credentialsNonExpired(true)
-					.roles(Set.of(adminRol))
-					.build();
-			Usuario estudiante = Usuario.builder()
-					.username("estudiante")
-					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
-					.email("correo@correo")
-					.tokenPassword(null)
-					.isEnable(true)
-					.accountNonExpired(true)
-					.accountNonLocked(true)
-					.credentialsNonExpired(true)
-					.roles(Set.of(estudianteRol))
-					.build();
-			Usuario profesor = Usuario.builder()
-					.username("profesor")
-					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
-					.email("correo@correo")
-					.tokenPassword(null)
-					.isEnable(true)
-					.accountNonExpired(true)
-					.accountNonLocked(true)
-					.credentialsNonExpired(true)
-					.roles(Set.of(profesorRol))
-					.build();
-			Usuario invitado = Usuario.builder()
-					.username("invitado")
-					.password("$2a$10$LCWNFGqAEiPfqMY57utodeV4cQeUOLeK56DNHYky.qNx68M/QHcj6")
-					.email("correo@correo")
-					.tokenPassword(null)
-					.isEnable(true)
-					.accountNonExpired(true)
-					.accountNonLocked(true)
-					.credentialsNonExpired(true)
-					.roles(Set.of(invitadoRol))
-					.build();
+			Usuario user = new Administrador();
+			user.setNombre("admin");
+			user.setApellido("admin");
+			user.setEmail("silviajanet@gmail.com");
+			user.setPassword(passwordEncoder.encode("1234"));
+			user.setCi("123");
+			user.setTelefono("1234567");
+			user.setDomicilio("calle 123");
+			user.setIsEnable(true);
+			user.setAccountNonExpired(true);
+			user.setAccountNonLocked(true);
+			user.setCredentialsNonExpired(true);
+			usuarioRepository.save(user);
 
-			usuarioRepository.saveAll(List.of(admin, estudiante, profesor, invitado));
+			Usuario estudiante = new Estudiante();
+			estudiante.setNombre("estudiante");
+			estudiante.setApellido("estudiante");
+			estudiante.setEmail("hola@hola1.com");
+			estudiante.setPassword(passwordEncoder.encode("1234"));
+			estudiante.setCi("1234");
+			estudiante.setTelefono("1234567");
+			estudiante.setDomicilio("calle 123");
+			estudiante.setIsEnable(true);
+			estudiante.setAccountNonExpired(true);
+			estudiante.setAccountNonLocked(true);
+			estudiante.setCredentialsNonExpired(true);
+			usuarioRepository.save(estudiante);
+
+			Usuario funcionario = new Funcionario();
+			funcionario.setNombre("funcionario");
+			funcionario.setApellido("funcionario");
+			funcionario.setEmail("hola@hola2.com");
+			funcionario.setPassword(passwordEncoder.encode("1234"));
+			funcionario.setCi("12345");
+			funcionario.setTelefono("1234567");
+			funcionario.setDomicilio("calle 123");
+			funcionario.setIsEnable(true);
+			funcionario.setAccountNonExpired(true);
+			funcionario.setAccountNonLocked(true);
+			funcionario.setCredentialsNonExpired(true);
+			usuarioRepository.save(funcionario);
+
+			Usuario coordinador = new Coordinador();
+			coordinador.setNombre("coordinador");
+			coordinador.setApellido("coordinador");
+			coordinador.setEmail("hola@hola3");
+			coordinador.setPassword(passwordEncoder.encode("1234"));
+			coordinador.setCi("123456");
+			coordinador.setTelefono("1234567");
+			coordinador.setDomicilio("calle 123");
+			coordinador.setIsEnable(true);
+			coordinador.setAccountNonExpired(true);
+			coordinador.setAccountNonLocked(true);
+			coordinador.setCredentialsNonExpired(true);
+			usuarioRepository.save(coordinador);
 		};
 	}
 }
