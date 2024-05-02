@@ -39,6 +39,9 @@ public abstract class Usuario {
     private String domicilio;
     private Date fechaNac;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<TokenPass> tokenPass = new HashSet<>();
+
     @Column(name= "is_enable")
     private Boolean isEnable;
 

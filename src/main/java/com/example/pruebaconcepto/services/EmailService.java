@@ -33,7 +33,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             Context context = new Context();
             Map<String, Object> model = new HashMap<>();
-            model.put("username", dto.getUsername());
+            model.put("email", dto.getMailTo());
             model.put("url", urlFront + dto.getTokenPassword());
             context.setVariables(model);
             String  htmlText = templateEngine.process("emailPass", context);
