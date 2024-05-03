@@ -1,7 +1,8 @@
 # gestedu-poc
-Pruebas de concepto para proyecto final tecnologo informatico (Java Spring)
+- Incorporación de Spring Security
+- Implementación de JWT
+- Restablecimiento de contraseña por correo electrónico
 
-<<<<<<< HEAD
 ## Endpoints
 
 ### Login
@@ -66,9 +67,3 @@ Pruebas de concepto para proyecto final tecnologo informatico (Java Spring)
   "tokenPassword": "token en el link del correo"
 }
 ```
-=======
-
-- Incorporación de Spring Security
-- Implementación de JWT
-- Restablecimiento de contraseña por correo electrónico
->>>>>>> 696b2b793944635fd6c7de8d63da1178fec524b8
