@@ -7,14 +7,15 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import com.example.pruebaconcepto.models.ListaNegraToken;
+import com.example.pruebaconcepto.repositories.ListaNegraTokenRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,6 +26,9 @@ public class JwtUtils {
 
     @Value("${security.jwt.user.generator}")
     private String userGenerator;
+
+    @Autowired
+    private ListaNegraTokenRepository listaNegraTokenRepository;
 
     public String crearToken(Authentication authentication) {
         Algorithm algoritmo = Algorithm.HMAC256(this.privateKey);
@@ -48,6 +52,11 @@ public class JwtUtils {
 
     public DecodedJWT validarToken(String token) {
         try{
+            ListaNegraToken listaNegraToken = listaNegraTokenRepository.findByToken(token);
+            if (listaNegraToken != null) {
+                throw new JWTVerificationException("Token en lista negra");
+            }
+
             Algorithm algoritmo = Algorithm.HMAC256(this.privateKey);
             JWTVerifier verifier = JWT.require(algoritmo)
                     .withIssuer(this.userGenerator)
@@ -69,5 +78,13 @@ public class JwtUtils {
 
     public Map<String, Claim> getAllClaims(DecodedJWT decodedJWT) {
         return decodedJWT.getClaims();
+    }
+
+    public void listaNegraToken(String token) {
+        DecodedJWT decodedJWT = validarToken(token);
+        ListaNegraToken blacklistedToken = new ListaNegraToken();
+        blacklistedToken.setToken(token);
+        blacklistedToken.setFechaExpiracion(decodedJWT.getExpiresAt().toInstant());
+        listaNegraTokenRepository.save(blacklistedToken);
     }
 }

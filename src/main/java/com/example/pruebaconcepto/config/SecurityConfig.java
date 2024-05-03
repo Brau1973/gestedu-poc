@@ -40,10 +40,6 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> {
-//                    authorize.requestMatchers(HttpMethod.POST, "/login").permitAll();
-//                    authorize.requestMatchers(HttpMethod.POST, "/registro").permitAll();
-//                    authorize.requestMatchers(HttpMethod.POST, "/registro/usuario").hasAuthority("ROL_ADMINISTRADOR");
-//                    authorize.requestMatchers(HttpMethod.GET, "/hello").hasAuthority("ROL_ADMINISTRADOR");
                     authorize.anyRequest().permitAll();
                 })
                 .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)

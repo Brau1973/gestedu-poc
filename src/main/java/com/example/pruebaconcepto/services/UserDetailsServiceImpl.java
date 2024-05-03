@@ -6,6 +6,7 @@ import com.example.pruebaconcepto.dtos.AuthResponse;
 import com.example.pruebaconcepto.models.*;
 import com.example.pruebaconcepto.repositories.UsuarioRepository;
 import com.example.pruebaconcepto.util.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -156,4 +157,5 @@ public class UserDetailsServiceImpl implements UserDetailsService{
         AuthResponse authResponse = new AuthResponse(usuarioGuardado.getEmail(), "Usuario registrado", accessToken, true);
         return authResponse;
     }
+
 }

@@ -2,7 +2,6 @@ package com.example.pruebaconcepto.controllers;
 
 import com.example.pruebaconcepto.dtos.*;
 import com.example.pruebaconcepto.models.Usuario;
-import com.example.pruebaconcepto.repositories.TokenPassRepository;
 import com.example.pruebaconcepto.services.EmailService;
 import com.example.pruebaconcepto.services.TokenPassService;
 import com.example.pruebaconcepto.services.UserDetailsServiceImpl;
@@ -20,10 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-
-
 @RestController
-@RequestMapping()
+@RequestMapping("/usuario")
 public class UsuarioController {
 
     @Autowired
@@ -44,19 +41,15 @@ public class UsuarioController {
     @Value("${spring.mail.username}")
     private String emailFrom;
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthLoginRequest userRequest) {
-        return new ResponseEntity<>(this.userDetailsService.loginUser(userRequest), HttpStatus.OK);
-    }
 
-    @PostMapping("/registro")
+    @PostMapping("/registro") //invitado
     public ResponseEntity<AuthResponse> registrarEstudiante(@RequestBody @Valid CrearUsuarioRequest crearUsuarioRequest) {
         crearUsuarioRequest.setTipoUsuario(TipoUsuario.ESTUDIANTE);
         return new ResponseEntity<>(this.userDetailsService.registrarUsuario(crearUsuarioRequest), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('ROL_ADMINISTRADOR')")
-    @PostMapping("/registro/usuario")
+    @PostMapping("/registro/admin")
     public ResponseEntity<AuthResponse> registrarUsuario(@RequestBody @Valid CrearUsuarioRequest crearUsuarioRequest) {
         return new ResponseEntity<>(this.userDetailsService.registrarUsuario(crearUsuarioRequest), HttpStatus.CREATED);
     }
@@ -102,6 +95,5 @@ public class UsuarioController {
 
         return new ResponseEntity<>("Contraseña actualizada.", HttpStatus.OK);
     }
-
 
 }
